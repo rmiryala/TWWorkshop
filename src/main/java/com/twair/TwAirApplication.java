@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class TwAirApplication {
 	@RequestMapping("/")
 	public String home(Model model) {
-        model.addAttribute("locations", DataSource.instance().fetchLocations());
+		model.addAttribute("locations", DataSource.instance().fetchLocations());
 		return "FlightSearch";
 	}
 
@@ -23,7 +23,10 @@ public class TwAirApplication {
 	public String search(@ModelAttribute(value="searchForm") SearchForm searchForm, Model model) throws Exception {
 		model.addAttribute("locations", DataSource.instance().fetchLocations());
 		try {
-			FlightSearch matchingFlights = DataSource.instance().fetchFlights().byLocation(searchForm.getFrom(), searchForm.getTo(),searchForm.getNoOfPassengers());
+			FlightSearch matchingFlights = DataSource.instance().fetchFlights().byLocation(searchForm.getFrom(), searchForm.getTo());
+			matchingFlights = matchingFlights.byDeparture(searchForm.getDepartureDate());
+			matchingFlights = matchingFlights.byClassType(searchForm.getClassType());
+			matchingFlights = matchingFlights.byAvailableSeats(searchForm.getClassType(), searchForm.getNumberSeats());
 			model.addAttribute("flights", matchingFlights.getFlightList());
 		}catch (Exception e) {
 			e.printStackTrace();
